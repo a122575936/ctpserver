@@ -5,6 +5,7 @@ sys.path.append('gen-py')
 # sys.path.insert(0, glob.glob('../../lib/py/build/lib.*')[0])
 
 from trader import Trader
+from MyTraderApi import MyTraderApi
 
 from thrift.transport import TSocket
 from thrift.transport import TTransport
@@ -13,7 +14,10 @@ from thrift.server import TServer
 
 class TraderHandler:
   def __init__(self):
-    pass
+    self.traderapi = MyTraderApi()
+    self.traderapi.Create()
+    self.traderapi.RegisterFront('tcp://180.168.212.75:41205')
+    self.traderapi.Init()
 
   def ping(self):
     print 'ping()'
