@@ -63,3 +63,4 @@ target/
 gen-py/
 thrift.exe
 *.con
+trader.txt
