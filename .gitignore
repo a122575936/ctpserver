@@ -64,3 +64,4 @@ gen-py/
 thrift.exe
 *.con
 trader.txt
+config.py

@@ -1,47 +1,32 @@
-from __init__ import TraderApi
+from __init__ import TraderApi, MdApi
 import inspect
 
-
-class Persion(object):
-    def __init__(self, name):
-        self.name = name
-
-    def say(self, str):
-        print(str)
-
-def inspectobject(obj):
-    for k in dir(obj):
-        attr = getattr(obj, k)
-        if k.startswith('On'):
-            #print(type(attr), k)
-            #print(attr.__func__)
-            print(inspect.getargspec(attr.__func__))
-            #print(dir(attr))
-        if k.startswith('Req'):
-            #print(type(attr), k)
-            #print(dir(attr))
-            print(inspect.getargspec(attr.__func__))
-
-def genTraderSpi(obj):
+def genSpi(obj):
+    classname = obj.__class__.__name__
+    myclassname = 'My' + classname
     ret = 'import logging\n'
-    ret += 'from ctp.futures import TraderApi,ApiStruct\n'
-    ret += 'from blinker import signal\n'
-    ret += "class MyTraderApi(TraderApi):\n"
+    ret += 'import Queue\n'
+    ret += 'import time\n'
+    ret += 'from ctp.futures import %s,ApiStruct\n' % (classname)
+    ret += 'from blinker import signal\n\n'
+    ret += "class %s(%s):\n" % (myclassname, classname)
     ret += '    def __init__(self):\n'
-    ret += '        self.log = logging.getLogger("MyTraderApi")\n'
+    ret += '        self.log = logging.getLogger("%s")\n' % (myclassname)
+    ret += '        self.queue = Queue.PriorityQueue()\n'
     ret += '        self.requestID = 1\n'
     ret += '        self.BrokerID = "8000"\n'
-    ret += '        self.InvestorID = "81180429"\n'
+    ret += '        self.InvestorID = "81180429"\n\n'
+    ret += '    def run(self):\n'
+    ret += '        while not self.queue.empty():\n'
+    ret += '            func = self.queue.get()\n'
+    ret += '            apply(func[1])\n'
+    ret += '            time.sleep(1)\n'
     for k in dir(obj):
         attr = getattr(obj, k)
         if k.startswith('On'):
-            #print(type(attr), k)
-            #print(attr.__func__)
             funcname = attr.__func__.__name__
-            # print(funcname)
             args = inspect.getargspec(attr.__func__).args
             ret += '\n'
-            #print(inspect.getargspec(attr.__func__))
             ret += '    def %s(%s):\n' % (funcname, ', '.join(args))
             ret += '        self.log.debug("%s")\n' % (funcname)
             for a in args[1:]:
@@ -51,7 +36,6 @@ def genTraderSpi(obj):
             else:
                 ret += '        signal("%s").send(self)\n' % (funcname)
 
-            #print(dir(attr))
         if k.startswith('Req'):
             funcname = attr.__func__.__name__
             arg1 = inspect.getargspec(attr.__func__).args[1]
@@ -59,27 +43,19 @@ def genTraderSpi(obj):
             ret += '    def %s(self, *args, **kwargs):\n' % (fn)
             ret += '        self.log.debug("%s")\n' % (fn)
             ret += '        self.requestID += 1\n'
+            ret += '        requestID = self.requestID\n'
             ret += '        %s = ApiStruct.%s(%s)\n' % (arg1, arg1[1:], '**kwargs')
             ret += '        %s.BrokerID = self.BrokerID\n' % (arg1)
             ret += '        %s.InvestorID= self.InvestorID\n' % (arg1)
-            ret += '        self.%s(%s, self.requestID)\n' % (funcname, arg1)
+            ret += '        self.queue.put((1000, lambda :self.%s(%s, requestID)))\n' % (funcname, arg1)
+            ret += '        self.run()\n'
             ret += '\n'
-    print(ret)
-    with open('MyTraderApi.py', 'w') as f:
+    #print(ret)
+    with open('%s.py' % (myclassname), 'w') as f:
         f.write(ret)
 
-
 def main():
-    #inspectobject(TraderApi)
-    #api = TraderApi()
-    #inspectobject(api)
-
-    genTraderSpi(TraderApi())
-
-    #p = Persion('liyiyi')
-    #p.say('hello')
-    #print(p.name)
-
-    #print(dir(Persion))
+    genSpi(TraderApi())
+    genSpi(MdApi())
 
 main()

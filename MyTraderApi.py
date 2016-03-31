@@ -1,12 +1,22 @@
 import logging
+import Queue
+import time
 from ctp.futures import TraderApi,ApiStruct
 from blinker import signal
+
 class MyTraderApi(TraderApi):
     def __init__(self):
         self.log = logging.getLogger("MyTraderApi")
+        self.queue = Queue.PriorityQueue()
         self.requestID = 1
         self.BrokerID = "8000"
         self.InvestorID = "81180429"
+
+    def run(self):
+        while not self.queue.empty():
+            func = self.queue.get()
+            apply(func[1])
+            time.sleep(1)
 
     def OnErrRtnBankToFutureByFuture(self, pReqTransfer, pRspInfo):
         self.log.debug("OnErrRtnBankToFutureByFuture")
@@ -573,400 +583,500 @@ class MyTraderApi(TraderApi):
     def myReqAuthenticate(self, *args, **kwargs):
         self.log.debug("myReqAuthenticate")
         self.requestID += 1
+        requestID = self.requestID
         pReqAuthenticate = ApiStruct.ReqAuthenticate(**kwargs)
         pReqAuthenticate.BrokerID = self.BrokerID
         pReqAuthenticate.InvestorID= self.InvestorID
-        self.ReqAuthenticate(pReqAuthenticate, self.requestID)
+        self.queue.put((1000, lambda :self.ReqAuthenticate(pReqAuthenticate, requestID)))
+        self.run()
 
     def myReqFromBankToFutureByFuture(self, *args, **kwargs):
         self.log.debug("myReqFromBankToFutureByFuture")
         self.requestID += 1
+        requestID = self.requestID
         pReqTransfer = ApiStruct.ReqTransfer(**kwargs)
         pReqTransfer.BrokerID = self.BrokerID
         pReqTransfer.InvestorID= self.InvestorID
-        self.ReqFromBankToFutureByFuture(pReqTransfer, self.requestID)
+        self.queue.put((1000, lambda :self.ReqFromBankToFutureByFuture(pReqTransfer, requestID)))
+        self.run()
 
     def myReqFromFutureToBankByFuture(self, *args, **kwargs):
         self.log.debug("myReqFromFutureToBankByFuture")
         self.requestID += 1
+        requestID = self.requestID
         pReqTransfer = ApiStruct.ReqTransfer(**kwargs)
         pReqTransfer.BrokerID = self.BrokerID
         pReqTransfer.InvestorID= self.InvestorID
-        self.ReqFromFutureToBankByFuture(pReqTransfer, self.requestID)
+        self.queue.put((1000, lambda :self.ReqFromFutureToBankByFuture(pReqTransfer, requestID)))
+        self.run()
 
     def myReqOrderAction(self, *args, **kwargs):
         self.log.debug("myReqOrderAction")
         self.requestID += 1
+        requestID = self.requestID
         pInputOrderAction = ApiStruct.InputOrderAction(**kwargs)
         pInputOrderAction.BrokerID = self.BrokerID
         pInputOrderAction.InvestorID= self.InvestorID
-        self.ReqOrderAction(pInputOrderAction, self.requestID)
+        self.queue.put((1000, lambda :self.ReqOrderAction(pInputOrderAction, requestID)))
+        self.run()
 
     def myReqOrderInsert(self, *args, **kwargs):
         self.log.debug("myReqOrderInsert")
         self.requestID += 1
+        requestID = self.requestID
         pInputOrder = ApiStruct.InputOrder(**kwargs)
         pInputOrder.BrokerID = self.BrokerID
         pInputOrder.InvestorID= self.InvestorID
-        self.ReqOrderInsert(pInputOrder, self.requestID)
+        self.queue.put((1000, lambda :self.ReqOrderInsert(pInputOrder, requestID)))
+        self.run()
 
     def myReqParkedOrderAction(self, *args, **kwargs):
         self.log.debug("myReqParkedOrderAction")
         self.requestID += 1
+        requestID = self.requestID
         pParkedOrderAction = ApiStruct.ParkedOrderAction(**kwargs)
         pParkedOrderAction.BrokerID = self.BrokerID
         pParkedOrderAction.InvestorID= self.InvestorID
-        self.ReqParkedOrderAction(pParkedOrderAction, self.requestID)
+        self.queue.put((1000, lambda :self.ReqParkedOrderAction(pParkedOrderAction, requestID)))
+        self.run()
 
     def myReqParkedOrderInsert(self, *args, **kwargs):
         self.log.debug("myReqParkedOrderInsert")
         self.requestID += 1
+        requestID = self.requestID
         pParkedOrder = ApiStruct.ParkedOrder(**kwargs)
         pParkedOrder.BrokerID = self.BrokerID
         pParkedOrder.InvestorID= self.InvestorID
-        self.ReqParkedOrderInsert(pParkedOrder, self.requestID)
+        self.queue.put((1000, lambda :self.ReqParkedOrderInsert(pParkedOrder, requestID)))
+        self.run()
 
     def myReqQryAccountregister(self, *args, **kwargs):
         self.log.debug("myReqQryAccountregister")
         self.requestID += 1
+        requestID = self.requestID
         pQryAccountregister = ApiStruct.QryAccountregister(**kwargs)
         pQryAccountregister.BrokerID = self.BrokerID
         pQryAccountregister.InvestorID= self.InvestorID
-        self.ReqQryAccountregister(pQryAccountregister, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryAccountregister(pQryAccountregister, requestID)))
+        self.run()
 
     def myReqQryBrokerTradingAlgos(self, *args, **kwargs):
         self.log.debug("myReqQryBrokerTradingAlgos")
         self.requestID += 1
+        requestID = self.requestID
         pQryBrokerTradingAlgos = ApiStruct.QryBrokerTradingAlgos(**kwargs)
         pQryBrokerTradingAlgos.BrokerID = self.BrokerID
         pQryBrokerTradingAlgos.InvestorID= self.InvestorID
-        self.ReqQryBrokerTradingAlgos(pQryBrokerTradingAlgos, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryBrokerTradingAlgos(pQryBrokerTradingAlgos, requestID)))
+        self.run()
 
     def myReqQryBrokerTradingParams(self, *args, **kwargs):
         self.log.debug("myReqQryBrokerTradingParams")
         self.requestID += 1
+        requestID = self.requestID
         pQryBrokerTradingParams = ApiStruct.QryBrokerTradingParams(**kwargs)
         pQryBrokerTradingParams.BrokerID = self.BrokerID
         pQryBrokerTradingParams.InvestorID= self.InvestorID
-        self.ReqQryBrokerTradingParams(pQryBrokerTradingParams, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryBrokerTradingParams(pQryBrokerTradingParams, requestID)))
+        self.run()
 
     def myReqQryCFMMCTradingAccountKey(self, *args, **kwargs):
         self.log.debug("myReqQryCFMMCTradingAccountKey")
         self.requestID += 1
+        requestID = self.requestID
         pQryCFMMCTradingAccountKey = ApiStruct.QryCFMMCTradingAccountKey(**kwargs)
         pQryCFMMCTradingAccountKey.BrokerID = self.BrokerID
         pQryCFMMCTradingAccountKey.InvestorID= self.InvestorID
-        self.ReqQryCFMMCTradingAccountKey(pQryCFMMCTradingAccountKey, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryCFMMCTradingAccountKey(pQryCFMMCTradingAccountKey, requestID)))
+        self.run()
 
     def myReqQryContractBank(self, *args, **kwargs):
         self.log.debug("myReqQryContractBank")
         self.requestID += 1
+        requestID = self.requestID
         pQryContractBank = ApiStruct.QryContractBank(**kwargs)
         pQryContractBank.BrokerID = self.BrokerID
         pQryContractBank.InvestorID= self.InvestorID
-        self.ReqQryContractBank(pQryContractBank, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryContractBank(pQryContractBank, requestID)))
+        self.run()
 
     def myReqQryDepthMarketData(self, *args, **kwargs):
         self.log.debug("myReqQryDepthMarketData")
         self.requestID += 1
+        requestID = self.requestID
         pQryDepthMarketData = ApiStruct.QryDepthMarketData(**kwargs)
         pQryDepthMarketData.BrokerID = self.BrokerID
         pQryDepthMarketData.InvestorID= self.InvestorID
-        self.ReqQryDepthMarketData(pQryDepthMarketData, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryDepthMarketData(pQryDepthMarketData, requestID)))
+        self.run()
 
     def myReqQryEWarrantOffset(self, *args, **kwargs):
         self.log.debug("myReqQryEWarrantOffset")
         self.requestID += 1
+        requestID = self.requestID
         pQryEWarrantOffset = ApiStruct.QryEWarrantOffset(**kwargs)
         pQryEWarrantOffset.BrokerID = self.BrokerID
         pQryEWarrantOffset.InvestorID= self.InvestorID
-        self.ReqQryEWarrantOffset(pQryEWarrantOffset, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryEWarrantOffset(pQryEWarrantOffset, requestID)))
+        self.run()
 
     def myReqQryExchange(self, *args, **kwargs):
         self.log.debug("myReqQryExchange")
         self.requestID += 1
+        requestID = self.requestID
         pQryExchange = ApiStruct.QryExchange(**kwargs)
         pQryExchange.BrokerID = self.BrokerID
         pQryExchange.InvestorID= self.InvestorID
-        self.ReqQryExchange(pQryExchange, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryExchange(pQryExchange, requestID)))
+        self.run()
 
     def myReqQryExchangeMarginRate(self, *args, **kwargs):
         self.log.debug("myReqQryExchangeMarginRate")
         self.requestID += 1
+        requestID = self.requestID
         pQryExchangeMarginRate = ApiStruct.QryExchangeMarginRate(**kwargs)
         pQryExchangeMarginRate.BrokerID = self.BrokerID
         pQryExchangeMarginRate.InvestorID= self.InvestorID
-        self.ReqQryExchangeMarginRate(pQryExchangeMarginRate, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryExchangeMarginRate(pQryExchangeMarginRate, requestID)))
+        self.run()
 
     def myReqQryExchangeMarginRateAdjust(self, *args, **kwargs):
         self.log.debug("myReqQryExchangeMarginRateAdjust")
         self.requestID += 1
+        requestID = self.requestID
         pQryExchangeMarginRateAdjust = ApiStruct.QryExchangeMarginRateAdjust(**kwargs)
         pQryExchangeMarginRateAdjust.BrokerID = self.BrokerID
         pQryExchangeMarginRateAdjust.InvestorID= self.InvestorID
-        self.ReqQryExchangeMarginRateAdjust(pQryExchangeMarginRateAdjust, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryExchangeMarginRateAdjust(pQryExchangeMarginRateAdjust, requestID)))
+        self.run()
 
     def myReqQryExchangeRate(self, *args, **kwargs):
         self.log.debug("myReqQryExchangeRate")
         self.requestID += 1
+        requestID = self.requestID
         pQryExchangeRate = ApiStruct.QryExchangeRate(**kwargs)
         pQryExchangeRate.BrokerID = self.BrokerID
         pQryExchangeRate.InvestorID= self.InvestorID
-        self.ReqQryExchangeRate(pQryExchangeRate, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryExchangeRate(pQryExchangeRate, requestID)))
+        self.run()
 
     def myReqQryInstrument(self, *args, **kwargs):
         self.log.debug("myReqQryInstrument")
         self.requestID += 1
+        requestID = self.requestID
         pQryInstrument = ApiStruct.QryInstrument(**kwargs)
         pQryInstrument.BrokerID = self.BrokerID
         pQryInstrument.InvestorID= self.InvestorID
-        self.ReqQryInstrument(pQryInstrument, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryInstrument(pQryInstrument, requestID)))
+        self.run()
 
     def myReqQryInstrumentCommissionRate(self, *args, **kwargs):
         self.log.debug("myReqQryInstrumentCommissionRate")
         self.requestID += 1
+        requestID = self.requestID
         pQryInstrumentCommissionRate = ApiStruct.QryInstrumentCommissionRate(**kwargs)
         pQryInstrumentCommissionRate.BrokerID = self.BrokerID
         pQryInstrumentCommissionRate.InvestorID= self.InvestorID
-        self.ReqQryInstrumentCommissionRate(pQryInstrumentCommissionRate, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryInstrumentCommissionRate(pQryInstrumentCommissionRate, requestID)))
+        self.run()
 
     def myReqQryInstrumentMarginRate(self, *args, **kwargs):
         self.log.debug("myReqQryInstrumentMarginRate")
         self.requestID += 1
+        requestID = self.requestID
         pQryInstrumentMarginRate = ApiStruct.QryInstrumentMarginRate(**kwargs)
         pQryInstrumentMarginRate.BrokerID = self.BrokerID
         pQryInstrumentMarginRate.InvestorID= self.InvestorID
-        self.ReqQryInstrumentMarginRate(pQryInstrumentMarginRate, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryInstrumentMarginRate(pQryInstrumentMarginRate, requestID)))
+        self.run()
 
     def myReqQryInvestor(self, *args, **kwargs):
         self.log.debug("myReqQryInvestor")
         self.requestID += 1
+        requestID = self.requestID
         pQryInvestor = ApiStruct.QryInvestor(**kwargs)
         pQryInvestor.BrokerID = self.BrokerID
         pQryInvestor.InvestorID= self.InvestorID
-        self.ReqQryInvestor(pQryInvestor, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryInvestor(pQryInvestor, requestID)))
+        self.run()
 
     def myReqQryInvestorPosition(self, *args, **kwargs):
         self.log.debug("myReqQryInvestorPosition")
         self.requestID += 1
+        requestID = self.requestID
         pQryInvestorPosition = ApiStruct.QryInvestorPosition(**kwargs)
         pQryInvestorPosition.BrokerID = self.BrokerID
         pQryInvestorPosition.InvestorID= self.InvestorID
-        self.ReqQryInvestorPosition(pQryInvestorPosition, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryInvestorPosition(pQryInvestorPosition, requestID)))
+        self.run()
 
     def myReqQryInvestorPositionCombineDetail(self, *args, **kwargs):
         self.log.debug("myReqQryInvestorPositionCombineDetail")
         self.requestID += 1
+        requestID = self.requestID
         pQryInvestorPositionCombineDetail = ApiStruct.QryInvestorPositionCombineDetail(**kwargs)
         pQryInvestorPositionCombineDetail.BrokerID = self.BrokerID
         pQryInvestorPositionCombineDetail.InvestorID= self.InvestorID
-        self.ReqQryInvestorPositionCombineDetail(pQryInvestorPositionCombineDetail, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryInvestorPositionCombineDetail(pQryInvestorPositionCombineDetail, requestID)))
+        self.run()
 
     def myReqQryInvestorPositionDetail(self, *args, **kwargs):
         self.log.debug("myReqQryInvestorPositionDetail")
         self.requestID += 1
+        requestID = self.requestID
         pQryInvestorPositionDetail = ApiStruct.QryInvestorPositionDetail(**kwargs)
         pQryInvestorPositionDetail.BrokerID = self.BrokerID
         pQryInvestorPositionDetail.InvestorID= self.InvestorID
-        self.ReqQryInvestorPositionDetail(pQryInvestorPositionDetail, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryInvestorPositionDetail(pQryInvestorPositionDetail, requestID)))
+        self.run()
 
     def myReqQryInvestorProductGroupMargin(self, *args, **kwargs):
         self.log.debug("myReqQryInvestorProductGroupMargin")
         self.requestID += 1
+        requestID = self.requestID
         pQryInvestorProductGroupMargin = ApiStruct.QryInvestorProductGroupMargin(**kwargs)
         pQryInvestorProductGroupMargin.BrokerID = self.BrokerID
         pQryInvestorProductGroupMargin.InvestorID= self.InvestorID
-        self.ReqQryInvestorProductGroupMargin(pQryInvestorProductGroupMargin, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryInvestorProductGroupMargin(pQryInvestorProductGroupMargin, requestID)))
+        self.run()
 
     def myReqQryNotice(self, *args, **kwargs):
         self.log.debug("myReqQryNotice")
         self.requestID += 1
+        requestID = self.requestID
         pQryNotice = ApiStruct.QryNotice(**kwargs)
         pQryNotice.BrokerID = self.BrokerID
         pQryNotice.InvestorID= self.InvestorID
-        self.ReqQryNotice(pQryNotice, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryNotice(pQryNotice, requestID)))
+        self.run()
 
     def myReqQryOrder(self, *args, **kwargs):
         self.log.debug("myReqQryOrder")
         self.requestID += 1
+        requestID = self.requestID
         pQryOrder = ApiStruct.QryOrder(**kwargs)
         pQryOrder.BrokerID = self.BrokerID
         pQryOrder.InvestorID= self.InvestorID
-        self.ReqQryOrder(pQryOrder, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryOrder(pQryOrder, requestID)))
+        self.run()
 
     def myReqQryParkedOrder(self, *args, **kwargs):
         self.log.debug("myReqQryParkedOrder")
         self.requestID += 1
+        requestID = self.requestID
         pQryParkedOrder = ApiStruct.QryParkedOrder(**kwargs)
         pQryParkedOrder.BrokerID = self.BrokerID
         pQryParkedOrder.InvestorID= self.InvestorID
-        self.ReqQryParkedOrder(pQryParkedOrder, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryParkedOrder(pQryParkedOrder, requestID)))
+        self.run()
 
     def myReqQryParkedOrderAction(self, *args, **kwargs):
         self.log.debug("myReqQryParkedOrderAction")
         self.requestID += 1
+        requestID = self.requestID
         pQryParkedOrderAction = ApiStruct.QryParkedOrderAction(**kwargs)
         pQryParkedOrderAction.BrokerID = self.BrokerID
         pQryParkedOrderAction.InvestorID= self.InvestorID
-        self.ReqQryParkedOrderAction(pQryParkedOrderAction, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryParkedOrderAction(pQryParkedOrderAction, requestID)))
+        self.run()
 
     def myReqQryProduct(self, *args, **kwargs):
         self.log.debug("myReqQryProduct")
         self.requestID += 1
+        requestID = self.requestID
         pQryProduct = ApiStruct.QryProduct(**kwargs)
         pQryProduct.BrokerID = self.BrokerID
         pQryProduct.InvestorID= self.InvestorID
-        self.ReqQryProduct(pQryProduct, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryProduct(pQryProduct, requestID)))
+        self.run()
 
     def myReqQrySecAgentACIDMap(self, *args, **kwargs):
         self.log.debug("myReqQrySecAgentACIDMap")
         self.requestID += 1
+        requestID = self.requestID
         pQrySecAgentACIDMap = ApiStruct.QrySecAgentACIDMap(**kwargs)
         pQrySecAgentACIDMap.BrokerID = self.BrokerID
         pQrySecAgentACIDMap.InvestorID= self.InvestorID
-        self.ReqQrySecAgentACIDMap(pQrySecAgentACIDMap, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQrySecAgentACIDMap(pQrySecAgentACIDMap, requestID)))
+        self.run()
 
     def myReqQrySettlementInfo(self, *args, **kwargs):
         self.log.debug("myReqQrySettlementInfo")
         self.requestID += 1
+        requestID = self.requestID
         pQrySettlementInfo = ApiStruct.QrySettlementInfo(**kwargs)
         pQrySettlementInfo.BrokerID = self.BrokerID
         pQrySettlementInfo.InvestorID= self.InvestorID
-        self.ReqQrySettlementInfo(pQrySettlementInfo, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQrySettlementInfo(pQrySettlementInfo, requestID)))
+        self.run()
 
     def myReqQrySettlementInfoConfirm(self, *args, **kwargs):
         self.log.debug("myReqQrySettlementInfoConfirm")
         self.requestID += 1
+        requestID = self.requestID
         pQrySettlementInfoConfirm = ApiStruct.QrySettlementInfoConfirm(**kwargs)
         pQrySettlementInfoConfirm.BrokerID = self.BrokerID
         pQrySettlementInfoConfirm.InvestorID= self.InvestorID
-        self.ReqQrySettlementInfoConfirm(pQrySettlementInfoConfirm, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQrySettlementInfoConfirm(pQrySettlementInfoConfirm, requestID)))
+        self.run()
 
     def myReqQryTrade(self, *args, **kwargs):
         self.log.debug("myReqQryTrade")
         self.requestID += 1
+        requestID = self.requestID
         pQryTrade = ApiStruct.QryTrade(**kwargs)
         pQryTrade.BrokerID = self.BrokerID
         pQryTrade.InvestorID= self.InvestorID
-        self.ReqQryTrade(pQryTrade, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryTrade(pQryTrade, requestID)))
+        self.run()
 
     def myReqQryTradingAccount(self, *args, **kwargs):
         self.log.debug("myReqQryTradingAccount")
         self.requestID += 1
+        requestID = self.requestID
         pQryTradingAccount = ApiStruct.QryTradingAccount(**kwargs)
         pQryTradingAccount.BrokerID = self.BrokerID
         pQryTradingAccount.InvestorID= self.InvestorID
-        self.ReqQryTradingAccount(pQryTradingAccount, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryTradingAccount(pQryTradingAccount, requestID)))
+        self.run()
 
     def myReqQryTradingCode(self, *args, **kwargs):
         self.log.debug("myReqQryTradingCode")
         self.requestID += 1
+        requestID = self.requestID
         pQryTradingCode = ApiStruct.QryTradingCode(**kwargs)
         pQryTradingCode.BrokerID = self.BrokerID
         pQryTradingCode.InvestorID= self.InvestorID
-        self.ReqQryTradingCode(pQryTradingCode, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryTradingCode(pQryTradingCode, requestID)))
+        self.run()
 
     def myReqQryTradingNotice(self, *args, **kwargs):
         self.log.debug("myReqQryTradingNotice")
         self.requestID += 1
+        requestID = self.requestID
         pQryTradingNotice = ApiStruct.QryTradingNotice(**kwargs)
         pQryTradingNotice.BrokerID = self.BrokerID
         pQryTradingNotice.InvestorID= self.InvestorID
-        self.ReqQryTradingNotice(pQryTradingNotice, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryTradingNotice(pQryTradingNotice, requestID)))
+        self.run()
 
     def myReqQryTransferBank(self, *args, **kwargs):
         self.log.debug("myReqQryTransferBank")
         self.requestID += 1
+        requestID = self.requestID
         pQryTransferBank = ApiStruct.QryTransferBank(**kwargs)
         pQryTransferBank.BrokerID = self.BrokerID
         pQryTransferBank.InvestorID= self.InvestorID
-        self.ReqQryTransferBank(pQryTransferBank, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryTransferBank(pQryTransferBank, requestID)))
+        self.run()
 
     def myReqQryTransferSerial(self, *args, **kwargs):
         self.log.debug("myReqQryTransferSerial")
         self.requestID += 1
+        requestID = self.requestID
         pQryTransferSerial = ApiStruct.QryTransferSerial(**kwargs)
         pQryTransferSerial.BrokerID = self.BrokerID
         pQryTransferSerial.InvestorID= self.InvestorID
-        self.ReqQryTransferSerial(pQryTransferSerial, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQryTransferSerial(pQryTransferSerial, requestID)))
+        self.run()
 
     def myReqQueryBankAccountMoneyByFuture(self, *args, **kwargs):
         self.log.debug("myReqQueryBankAccountMoneyByFuture")
         self.requestID += 1
+        requestID = self.requestID
         pReqQueryAccount = ApiStruct.ReqQueryAccount(**kwargs)
         pReqQueryAccount.BrokerID = self.BrokerID
         pReqQueryAccount.InvestorID= self.InvestorID
-        self.ReqQueryBankAccountMoneyByFuture(pReqQueryAccount, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQueryBankAccountMoneyByFuture(pReqQueryAccount, requestID)))
+        self.run()
 
     def myReqQueryCFMMCTradingAccountToken(self, *args, **kwargs):
         self.log.debug("myReqQueryCFMMCTradingAccountToken")
         self.requestID += 1
+        requestID = self.requestID
         pQueryCFMMCTradingAccountToken = ApiStruct.QueryCFMMCTradingAccountToken(**kwargs)
         pQueryCFMMCTradingAccountToken.BrokerID = self.BrokerID
         pQueryCFMMCTradingAccountToken.InvestorID= self.InvestorID
-        self.ReqQueryCFMMCTradingAccountToken(pQueryCFMMCTradingAccountToken, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQueryCFMMCTradingAccountToken(pQueryCFMMCTradingAccountToken, requestID)))
+        self.run()
 
     def myReqQueryMaxOrderVolume(self, *args, **kwargs):
         self.log.debug("myReqQueryMaxOrderVolume")
         self.requestID += 1
+        requestID = self.requestID
         pQueryMaxOrderVolume = ApiStruct.QueryMaxOrderVolume(**kwargs)
         pQueryMaxOrderVolume.BrokerID = self.BrokerID
         pQueryMaxOrderVolume.InvestorID= self.InvestorID
-        self.ReqQueryMaxOrderVolume(pQueryMaxOrderVolume, self.requestID)
+        self.queue.put((1000, lambda :self.ReqQueryMaxOrderVolume(pQueryMaxOrderVolume, requestID)))
+        self.run()
 
     def myReqRemoveParkedOrder(self, *args, **kwargs):
         self.log.debug("myReqRemoveParkedOrder")
         self.requestID += 1
+        requestID = self.requestID
         pRemoveParkedOrder = ApiStruct.RemoveParkedOrder(**kwargs)
         pRemoveParkedOrder.BrokerID = self.BrokerID
         pRemoveParkedOrder.InvestorID= self.InvestorID
-        self.ReqRemoveParkedOrder(pRemoveParkedOrder, self.requestID)
+        self.queue.put((1000, lambda :self.ReqRemoveParkedOrder(pRemoveParkedOrder, requestID)))
+        self.run()
 
     def myReqRemoveParkedOrderAction(self, *args, **kwargs):
         self.log.debug("myReqRemoveParkedOrderAction")
         self.requestID += 1
+        requestID = self.requestID
         pRemoveParkedOrderAction = ApiStruct.RemoveParkedOrderAction(**kwargs)
         pRemoveParkedOrderAction.BrokerID = self.BrokerID
         pRemoveParkedOrderAction.InvestorID= self.InvestorID
-        self.ReqRemoveParkedOrderAction(pRemoveParkedOrderAction, self.requestID)
+        self.queue.put((1000, lambda :self.ReqRemoveParkedOrderAction(pRemoveParkedOrderAction, requestID)))
+        self.run()
 
     def myReqSettlementInfoConfirm(self, *args, **kwargs):
         self.log.debug("myReqSettlementInfoConfirm")
         self.requestID += 1
+        requestID = self.requestID
         pSettlementInfoConfirm = ApiStruct.SettlementInfoConfirm(**kwargs)
         pSettlementInfoConfirm.BrokerID = self.BrokerID
         pSettlementInfoConfirm.InvestorID= self.InvestorID
-        self.ReqSettlementInfoConfirm(pSettlementInfoConfirm, self.requestID)
+        self.queue.put((1000, lambda :self.ReqSettlementInfoConfirm(pSettlementInfoConfirm, requestID)))
+        self.run()
 
     def myReqTradingAccountPasswordUpdate(self, *args, **kwargs):
         self.log.debug("myReqTradingAccountPasswordUpdate")
         self.requestID += 1
+        requestID = self.requestID
         pTradingAccountPasswordUpdate = ApiStruct.TradingAccountPasswordUpdate(**kwargs)
         pTradingAccountPasswordUpdate.BrokerID = self.BrokerID
         pTradingAccountPasswordUpdate.InvestorID= self.InvestorID
-        self.ReqTradingAccountPasswordUpdate(pTradingAccountPasswordUpdate, self.requestID)
+        self.queue.put((1000, lambda :self.ReqTradingAccountPasswordUpdate(pTradingAccountPasswordUpdate, requestID)))
+        self.run()
 
     def myReqUserLogin(self, *args, **kwargs):
         self.log.debug("myReqUserLogin")
         self.requestID += 1
+        requestID = self.requestID
         pReqUserLogin = ApiStruct.ReqUserLogin(**kwargs)
         pReqUserLogin.BrokerID = self.BrokerID
         pReqUserLogin.InvestorID= self.InvestorID
-        self.ReqUserLogin(pReqUserLogin, self.requestID)
+        self.queue.put((1000, lambda :self.ReqUserLogin(pReqUserLogin, requestID)))
+        self.run()
 
     def myReqUserLogout(self, *args, **kwargs):
         self.log.debug("myReqUserLogout")
         self.requestID += 1
+        requestID = self.requestID
         pUserLogout = ApiStruct.UserLogout(**kwargs)
         pUserLogout.BrokerID = self.BrokerID
         pUserLogout.InvestorID= self.InvestorID
-        self.ReqUserLogout(pUserLogout, self.requestID)
+        self.queue.put((1000, lambda :self.ReqUserLogout(pUserLogout, requestID)))
+        self.run()
 
     def myReqUserPasswordUpdate(self, *args, **kwargs):
         self.log.debug("myReqUserPasswordUpdate")
         self.requestID += 1
+        requestID = self.requestID
         pUserPasswordUpdate = ApiStruct.UserPasswordUpdate(**kwargs)
         pUserPasswordUpdate.BrokerID = self.BrokerID
         pUserPasswordUpdate.InvestorID= self.InvestorID
-        self.ReqUserPasswordUpdate(pUserPasswordUpdate, self.requestID)
+        self.queue.put((1000, lambda :self.ReqUserPasswordUpdate(pUserPasswordUpdate, requestID)))
+        self.run()
 

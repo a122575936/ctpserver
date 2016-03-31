@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, glob, logging
+import sys, glob, logging, config
 sys.path.append('gen-py')
 # sys.path.insert(0, glob.glob('../../lib/py/build/lib.*')[0])
 
@@ -14,6 +14,8 @@ from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
 
 logging.basicConfig(level=logging.DEBUG,
+        format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+        datefmt='%a, %d %b %Y %H:%M:%S',
         filename='trader.txt',
         filemode='w')
 
@@ -21,6 +23,8 @@ class TraderHandler:
   def __init__(self):
     signal('OnFrontConnected').connect(self.OnFrontConnected)
     signal('OnRtnTradingNotice').connect(self.OnRtnTradingNotice)
+    signal('OnRtnOrder').connect(self.OnRtnOrder)
+    signal('OnRspQryInvestorPositionDetail').connect(self.OnRspQryInvestorPositionDetail)
     self.traderapi = MyTraderApi()
     self.traderapi.Create()
     self.traderapi.RegisterFront('tcp://180.168.212.75:41205')
@@ -33,12 +37,18 @@ class TraderHandler:
     print 'check(%s,%s)' % (contract, ordertype)
 
   def OnFrontConnected(self, sender, **kwargs):
-    print('OnFrontConnected ', kwargs)
-    self.traderapi.myReqUserLogin(UserID = '', Password = '')
+    self.traderapi.myReqUserLogin(UserID = config.UserID, Password = config.Password)
+    self.traderapi.myReqQryInvestorPositionDetail()
 
   def OnRtnTradingNotice(self, sender, **kwargs):
-    print('OnFrontConnected ', kwargs)
     print(kwargs['pTradingNoticeInfo'].FieldContent.decode('gbk'))
+
+  def OnRspQryInvestorPositionDetail(self, sender, **kwargs):
+    pass
+
+  def OnRtnOrder(self, sender, **kwargs):
+    pOrder = kwargs['pOrder']
+    print('OnRtnOrder %s %s' % (pOrder.InstrumentID, pOrder.StatusMsg.decode('gbk')))
 
 handler = TraderHandler()
 processor = Trader.Processor(handler)
