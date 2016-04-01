@@ -110,18 +110,22 @@ class TraderHandler:
         pOrder = kwargs['pOrder']
         print('OnRtnOrder %s %s' % (pOrder.InstrumentID, pOrder.StatusMsg.decode('gbk')))
 
-handler = TraderHandler()
-processor = Trader.Processor(handler)
-transport = TSocket.TServerSocket(port=9090)
-tfactory = TTransport.TBufferedTransportFactory()
-pfactory = TJSONProtocol.TJSONProtocolFactory()
+def StartServer():
+    handler = TraderHandler()
+    processor = Trader.Processor(handler)
+    transport = TSocket.TServerSocket(port=9090)
+    tfactory = TTransport.TBufferedTransportFactory()
+    pfactory = TJSONProtocol.TJSONProtocolFactory()
 
-server = THttpServer.THttpServer(processor, ('127.0.0.1', 8000), pfactory, pfactory)
+    server = THttpServer.THttpServer(processor, ('127.0.0.1', 8000), pfactory, pfactory)
 
-# You could do one of these for a multithreaded server
-#server = TServer.TThreadedServer(processor, transport, tfactory, pfactory)
-#server = TServer.TThreadPoolServer(processor, transport, tfactory, pfactory)
+    # You could do one of these for a multithreaded server
+    #server = TServer.TThreadedServer(processor, transport, tfactory, pfactory)
+    #server = TServer.TThreadPoolServer(processor, transport, tfactory, pfactory)
 
-print 'Starting the server...'
-server.serve()
-print 'done.'
+    print 'Starting the server...'
+    server.serve()
+    print 'done.'
+
+if __name__ == '__main__':
+    StartServer()
