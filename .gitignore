@@ -60,7 +60,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
-gen-py/
 thrift.exe
 *.con
 trader.txt
