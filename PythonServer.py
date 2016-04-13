@@ -26,6 +26,7 @@ def evalApiStruct(str):
 class TraderHandler:
     def __init__(self):
         signal('OnFrontConnected').connect(self.OnFrontConnected)
+        signal('OnRspUserLogin').connect(self.OnRspUserLogin)
         #signal('OnRtnInstrumentStatus').connect(self.OnRtnInstrumentStatus)
         signal('OnRtnTradingNotice').connect(self.OnRtnTradingNotice)
         signal('OnRtnOrder').connect(self.OnRtnOrder)
@@ -81,6 +82,11 @@ class TraderHandler:
                 IsAutoSuspend = 0,
                 )
 
+    def OnRspUserLogin(self, sender, **kwargs):
+        #self.investorPositions = []
+        #self.traderapi.myReqQryInvestorPosition()
+        pass
+
     def OnFrontConnected(self, sender, **kwargs):
         self.traderapi.myReqUserLogin(UserID = config.UserID, Password = config.Password)
         self.traderapi.myReqQryDepthMarketData()
@@ -103,8 +109,9 @@ class TraderHandler:
         self.depthMarketDataDict[pDepthMarketData.InstrumentID] = evalApiStruct(pDepthMarketData.__str__())
 
     def OnRtnTrade(self, sender, **kwargs):
-        self.investorPositions = []
-        self.traderapi.myReqQryInvestorPosition()
+        #self.investorPositions = []
+        #self.traderapi.myReqQryInvestorPosition()
+        pass
 
     def OnRtnOrder(self, sender, **kwargs):
         pOrder = kwargs['pOrder']

@@ -4,19 +4,21 @@ import time
 from ctp.futures import TraderApi,ApiStruct
 from blinker import signal
 
+from call_repeatedly import call_repeatedly
+
 class MyTraderApi(TraderApi):
     def __init__(self):
         self.log = logging.getLogger("MyTraderApi")
         self.queue = Queue.PriorityQueue()
         self.requestID = 1
+        call_repeatedly(1, self.run)
         self.BrokerID = "8000"
         self.InvestorID = "81180429"
 
     def run(self):
-        while not self.queue.empty():
+        if not self.queue.empty():
             func = self.queue.get()
             apply(func[1])
-            time.sleep(1)
 
     def OnErrRtnBankToFutureByFuture(self, pReqTransfer, pRspInfo):
         self.log.debug("OnErrRtnBankToFutureByFuture")
@@ -588,7 +590,6 @@ class MyTraderApi(TraderApi):
         pReqAuthenticate.BrokerID = self.BrokerID
         pReqAuthenticate.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqAuthenticate(pReqAuthenticate, requestID)))
-        self.run()
 
     def myReqFromBankToFutureByFuture(self, *args, **kwargs):
         self.log.debug("myReqFromBankToFutureByFuture")
@@ -598,7 +599,6 @@ class MyTraderApi(TraderApi):
         pReqTransfer.BrokerID = self.BrokerID
         pReqTransfer.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqFromBankToFutureByFuture(pReqTransfer, requestID)))
-        self.run()
 
     def myReqFromFutureToBankByFuture(self, *args, **kwargs):
         self.log.debug("myReqFromFutureToBankByFuture")
@@ -608,7 +608,6 @@ class MyTraderApi(TraderApi):
         pReqTransfer.BrokerID = self.BrokerID
         pReqTransfer.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqFromFutureToBankByFuture(pReqTransfer, requestID)))
-        self.run()
 
     def myReqOrderAction(self, *args, **kwargs):
         self.log.debug("myReqOrderAction")
@@ -618,7 +617,6 @@ class MyTraderApi(TraderApi):
         pInputOrderAction.BrokerID = self.BrokerID
         pInputOrderAction.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqOrderAction(pInputOrderAction, requestID)))
-        self.run()
 
     def myReqOrderInsert(self, *args, **kwargs):
         self.log.debug("myReqOrderInsert")
@@ -628,7 +626,6 @@ class MyTraderApi(TraderApi):
         pInputOrder.BrokerID = self.BrokerID
         pInputOrder.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqOrderInsert(pInputOrder, requestID)))
-        self.run()
 
     def myReqParkedOrderAction(self, *args, **kwargs):
         self.log.debug("myReqParkedOrderAction")
@@ -638,7 +635,6 @@ class MyTraderApi(TraderApi):
         pParkedOrderAction.BrokerID = self.BrokerID
         pParkedOrderAction.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqParkedOrderAction(pParkedOrderAction, requestID)))
-        self.run()
 
     def myReqParkedOrderInsert(self, *args, **kwargs):
         self.log.debug("myReqParkedOrderInsert")
@@ -648,7 +644,6 @@ class MyTraderApi(TraderApi):
         pParkedOrder.BrokerID = self.BrokerID
         pParkedOrder.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqParkedOrderInsert(pParkedOrder, requestID)))
-        self.run()
 
     def myReqQryAccountregister(self, *args, **kwargs):
         self.log.debug("myReqQryAccountregister")
@@ -658,7 +653,6 @@ class MyTraderApi(TraderApi):
         pQryAccountregister.BrokerID = self.BrokerID
         pQryAccountregister.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryAccountregister(pQryAccountregister, requestID)))
-        self.run()
 
     def myReqQryBrokerTradingAlgos(self, *args, **kwargs):
         self.log.debug("myReqQryBrokerTradingAlgos")
@@ -668,7 +662,6 @@ class MyTraderApi(TraderApi):
         pQryBrokerTradingAlgos.BrokerID = self.BrokerID
         pQryBrokerTradingAlgos.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryBrokerTradingAlgos(pQryBrokerTradingAlgos, requestID)))
-        self.run()
 
     def myReqQryBrokerTradingParams(self, *args, **kwargs):
         self.log.debug("myReqQryBrokerTradingParams")
@@ -678,7 +671,6 @@ class MyTraderApi(TraderApi):
         pQryBrokerTradingParams.BrokerID = self.BrokerID
         pQryBrokerTradingParams.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryBrokerTradingParams(pQryBrokerTradingParams, requestID)))
-        self.run()
 
     def myReqQryCFMMCTradingAccountKey(self, *args, **kwargs):
         self.log.debug("myReqQryCFMMCTradingAccountKey")
@@ -688,7 +680,6 @@ class MyTraderApi(TraderApi):
         pQryCFMMCTradingAccountKey.BrokerID = self.BrokerID
         pQryCFMMCTradingAccountKey.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryCFMMCTradingAccountKey(pQryCFMMCTradingAccountKey, requestID)))
-        self.run()
 
     def myReqQryContractBank(self, *args, **kwargs):
         self.log.debug("myReqQryContractBank")
@@ -698,7 +689,6 @@ class MyTraderApi(TraderApi):
         pQryContractBank.BrokerID = self.BrokerID
         pQryContractBank.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryContractBank(pQryContractBank, requestID)))
-        self.run()
 
     def myReqQryDepthMarketData(self, *args, **kwargs):
         self.log.debug("myReqQryDepthMarketData")
@@ -708,7 +698,6 @@ class MyTraderApi(TraderApi):
         pQryDepthMarketData.BrokerID = self.BrokerID
         pQryDepthMarketData.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryDepthMarketData(pQryDepthMarketData, requestID)))
-        self.run()
 
     def myReqQryEWarrantOffset(self, *args, **kwargs):
         self.log.debug("myReqQryEWarrantOffset")
@@ -718,7 +707,6 @@ class MyTraderApi(TraderApi):
         pQryEWarrantOffset.BrokerID = self.BrokerID
         pQryEWarrantOffset.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryEWarrantOffset(pQryEWarrantOffset, requestID)))
-        self.run()
 
     def myReqQryExchange(self, *args, **kwargs):
         self.log.debug("myReqQryExchange")
@@ -728,7 +716,6 @@ class MyTraderApi(TraderApi):
         pQryExchange.BrokerID = self.BrokerID
         pQryExchange.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryExchange(pQryExchange, requestID)))
-        self.run()
 
     def myReqQryExchangeMarginRate(self, *args, **kwargs):
         self.log.debug("myReqQryExchangeMarginRate")
@@ -738,7 +725,6 @@ class MyTraderApi(TraderApi):
         pQryExchangeMarginRate.BrokerID = self.BrokerID
         pQryExchangeMarginRate.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryExchangeMarginRate(pQryExchangeMarginRate, requestID)))
-        self.run()
 
     def myReqQryExchangeMarginRateAdjust(self, *args, **kwargs):
         self.log.debug("myReqQryExchangeMarginRateAdjust")
@@ -748,7 +734,6 @@ class MyTraderApi(TraderApi):
         pQryExchangeMarginRateAdjust.BrokerID = self.BrokerID
         pQryExchangeMarginRateAdjust.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryExchangeMarginRateAdjust(pQryExchangeMarginRateAdjust, requestID)))
-        self.run()
 
     def myReqQryExchangeRate(self, *args, **kwargs):
         self.log.debug("myReqQryExchangeRate")
@@ -758,7 +743,6 @@ class MyTraderApi(TraderApi):
         pQryExchangeRate.BrokerID = self.BrokerID
         pQryExchangeRate.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryExchangeRate(pQryExchangeRate, requestID)))
-        self.run()
 
     def myReqQryInstrument(self, *args, **kwargs):
         self.log.debug("myReqQryInstrument")
@@ -768,7 +752,6 @@ class MyTraderApi(TraderApi):
         pQryInstrument.BrokerID = self.BrokerID
         pQryInstrument.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryInstrument(pQryInstrument, requestID)))
-        self.run()
 
     def myReqQryInstrumentCommissionRate(self, *args, **kwargs):
         self.log.debug("myReqQryInstrumentCommissionRate")
@@ -778,7 +761,6 @@ class MyTraderApi(TraderApi):
         pQryInstrumentCommissionRate.BrokerID = self.BrokerID
         pQryInstrumentCommissionRate.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryInstrumentCommissionRate(pQryInstrumentCommissionRate, requestID)))
-        self.run()
 
     def myReqQryInstrumentMarginRate(self, *args, **kwargs):
         self.log.debug("myReqQryInstrumentMarginRate")
@@ -788,7 +770,6 @@ class MyTraderApi(TraderApi):
         pQryInstrumentMarginRate.BrokerID = self.BrokerID
         pQryInstrumentMarginRate.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryInstrumentMarginRate(pQryInstrumentMarginRate, requestID)))
-        self.run()
 
     def myReqQryInvestor(self, *args, **kwargs):
         self.log.debug("myReqQryInvestor")
@@ -798,7 +779,6 @@ class MyTraderApi(TraderApi):
         pQryInvestor.BrokerID = self.BrokerID
         pQryInvestor.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryInvestor(pQryInvestor, requestID)))
-        self.run()
 
     def myReqQryInvestorPosition(self, *args, **kwargs):
         self.log.debug("myReqQryInvestorPosition")
@@ -808,7 +788,6 @@ class MyTraderApi(TraderApi):
         pQryInvestorPosition.BrokerID = self.BrokerID
         pQryInvestorPosition.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryInvestorPosition(pQryInvestorPosition, requestID)))
-        self.run()
 
     def myReqQryInvestorPositionCombineDetail(self, *args, **kwargs):
         self.log.debug("myReqQryInvestorPositionCombineDetail")
@@ -818,7 +797,6 @@ class MyTraderApi(TraderApi):
         pQryInvestorPositionCombineDetail.BrokerID = self.BrokerID
         pQryInvestorPositionCombineDetail.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryInvestorPositionCombineDetail(pQryInvestorPositionCombineDetail, requestID)))
-        self.run()
 
     def myReqQryInvestorPositionDetail(self, *args, **kwargs):
         self.log.debug("myReqQryInvestorPositionDetail")
@@ -828,7 +806,6 @@ class MyTraderApi(TraderApi):
         pQryInvestorPositionDetail.BrokerID = self.BrokerID
         pQryInvestorPositionDetail.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryInvestorPositionDetail(pQryInvestorPositionDetail, requestID)))
-        self.run()
 
     def myReqQryInvestorProductGroupMargin(self, *args, **kwargs):
         self.log.debug("myReqQryInvestorProductGroupMargin")
@@ -838,7 +815,6 @@ class MyTraderApi(TraderApi):
         pQryInvestorProductGroupMargin.BrokerID = self.BrokerID
         pQryInvestorProductGroupMargin.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryInvestorProductGroupMargin(pQryInvestorProductGroupMargin, requestID)))
-        self.run()
 
     def myReqQryNotice(self, *args, **kwargs):
         self.log.debug("myReqQryNotice")
@@ -848,7 +824,6 @@ class MyTraderApi(TraderApi):
         pQryNotice.BrokerID = self.BrokerID
         pQryNotice.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryNotice(pQryNotice, requestID)))
-        self.run()
 
     def myReqQryOrder(self, *args, **kwargs):
         self.log.debug("myReqQryOrder")
@@ -858,7 +833,6 @@ class MyTraderApi(TraderApi):
         pQryOrder.BrokerID = self.BrokerID
         pQryOrder.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryOrder(pQryOrder, requestID)))
-        self.run()
 
     def myReqQryParkedOrder(self, *args, **kwargs):
         self.log.debug("myReqQryParkedOrder")
@@ -868,7 +842,6 @@ class MyTraderApi(TraderApi):
         pQryParkedOrder.BrokerID = self.BrokerID
         pQryParkedOrder.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryParkedOrder(pQryParkedOrder, requestID)))
-        self.run()
 
     def myReqQryParkedOrderAction(self, *args, **kwargs):
         self.log.debug("myReqQryParkedOrderAction")
@@ -878,7 +851,6 @@ class MyTraderApi(TraderApi):
         pQryParkedOrderAction.BrokerID = self.BrokerID
         pQryParkedOrderAction.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryParkedOrderAction(pQryParkedOrderAction, requestID)))
-        self.run()
 
     def myReqQryProduct(self, *args, **kwargs):
         self.log.debug("myReqQryProduct")
@@ -888,7 +860,6 @@ class MyTraderApi(TraderApi):
         pQryProduct.BrokerID = self.BrokerID
         pQryProduct.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryProduct(pQryProduct, requestID)))
-        self.run()
 
     def myReqQrySecAgentACIDMap(self, *args, **kwargs):
         self.log.debug("myReqQrySecAgentACIDMap")
@@ -898,7 +869,6 @@ class MyTraderApi(TraderApi):
         pQrySecAgentACIDMap.BrokerID = self.BrokerID
         pQrySecAgentACIDMap.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQrySecAgentACIDMap(pQrySecAgentACIDMap, requestID)))
-        self.run()
 
     def myReqQrySettlementInfo(self, *args, **kwargs):
         self.log.debug("myReqQrySettlementInfo")
@@ -908,7 +878,6 @@ class MyTraderApi(TraderApi):
         pQrySettlementInfo.BrokerID = self.BrokerID
         pQrySettlementInfo.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQrySettlementInfo(pQrySettlementInfo, requestID)))
-        self.run()
 
     def myReqQrySettlementInfoConfirm(self, *args, **kwargs):
         self.log.debug("myReqQrySettlementInfoConfirm")
@@ -918,7 +887,6 @@ class MyTraderApi(TraderApi):
         pQrySettlementInfoConfirm.BrokerID = self.BrokerID
         pQrySettlementInfoConfirm.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQrySettlementInfoConfirm(pQrySettlementInfoConfirm, requestID)))
-        self.run()
 
     def myReqQryTrade(self, *args, **kwargs):
         self.log.debug("myReqQryTrade")
@@ -928,7 +896,6 @@ class MyTraderApi(TraderApi):
         pQryTrade.BrokerID = self.BrokerID
         pQryTrade.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryTrade(pQryTrade, requestID)))
-        self.run()
 
     def myReqQryTradingAccount(self, *args, **kwargs):
         self.log.debug("myReqQryTradingAccount")
@@ -938,7 +905,6 @@ class MyTraderApi(TraderApi):
         pQryTradingAccount.BrokerID = self.BrokerID
         pQryTradingAccount.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryTradingAccount(pQryTradingAccount, requestID)))
-        self.run()
 
     def myReqQryTradingCode(self, *args, **kwargs):
         self.log.debug("myReqQryTradingCode")
@@ -948,7 +914,6 @@ class MyTraderApi(TraderApi):
         pQryTradingCode.BrokerID = self.BrokerID
         pQryTradingCode.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryTradingCode(pQryTradingCode, requestID)))
-        self.run()
 
     def myReqQryTradingNotice(self, *args, **kwargs):
         self.log.debug("myReqQryTradingNotice")
@@ -958,7 +923,6 @@ class MyTraderApi(TraderApi):
         pQryTradingNotice.BrokerID = self.BrokerID
         pQryTradingNotice.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryTradingNotice(pQryTradingNotice, requestID)))
-        self.run()
 
     def myReqQryTransferBank(self, *args, **kwargs):
         self.log.debug("myReqQryTransferBank")
@@ -968,7 +932,6 @@ class MyTraderApi(TraderApi):
         pQryTransferBank.BrokerID = self.BrokerID
         pQryTransferBank.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryTransferBank(pQryTransferBank, requestID)))
-        self.run()
 
     def myReqQryTransferSerial(self, *args, **kwargs):
         self.log.debug("myReqQryTransferSerial")
@@ -978,7 +941,6 @@ class MyTraderApi(TraderApi):
         pQryTransferSerial.BrokerID = self.BrokerID
         pQryTransferSerial.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQryTransferSerial(pQryTransferSerial, requestID)))
-        self.run()
 
     def myReqQueryBankAccountMoneyByFuture(self, *args, **kwargs):
         self.log.debug("myReqQueryBankAccountMoneyByFuture")
@@ -988,7 +950,6 @@ class MyTraderApi(TraderApi):
         pReqQueryAccount.BrokerID = self.BrokerID
         pReqQueryAccount.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQueryBankAccountMoneyByFuture(pReqQueryAccount, requestID)))
-        self.run()
 
     def myReqQueryCFMMCTradingAccountToken(self, *args, **kwargs):
         self.log.debug("myReqQueryCFMMCTradingAccountToken")
@@ -998,7 +959,6 @@ class MyTraderApi(TraderApi):
         pQueryCFMMCTradingAccountToken.BrokerID = self.BrokerID
         pQueryCFMMCTradingAccountToken.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQueryCFMMCTradingAccountToken(pQueryCFMMCTradingAccountToken, requestID)))
-        self.run()
 
     def myReqQueryMaxOrderVolume(self, *args, **kwargs):
         self.log.debug("myReqQueryMaxOrderVolume")
@@ -1008,7 +968,6 @@ class MyTraderApi(TraderApi):
         pQueryMaxOrderVolume.BrokerID = self.BrokerID
         pQueryMaxOrderVolume.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqQueryMaxOrderVolume(pQueryMaxOrderVolume, requestID)))
-        self.run()
 
     def myReqRemoveParkedOrder(self, *args, **kwargs):
         self.log.debug("myReqRemoveParkedOrder")
@@ -1018,7 +977,6 @@ class MyTraderApi(TraderApi):
         pRemoveParkedOrder.BrokerID = self.BrokerID
         pRemoveParkedOrder.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqRemoveParkedOrder(pRemoveParkedOrder, requestID)))
-        self.run()
 
     def myReqRemoveParkedOrderAction(self, *args, **kwargs):
         self.log.debug("myReqRemoveParkedOrderAction")
@@ -1028,7 +986,6 @@ class MyTraderApi(TraderApi):
         pRemoveParkedOrderAction.BrokerID = self.BrokerID
         pRemoveParkedOrderAction.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqRemoveParkedOrderAction(pRemoveParkedOrderAction, requestID)))
-        self.run()
 
     def myReqSettlementInfoConfirm(self, *args, **kwargs):
         self.log.debug("myReqSettlementInfoConfirm")
@@ -1038,7 +995,6 @@ class MyTraderApi(TraderApi):
         pSettlementInfoConfirm.BrokerID = self.BrokerID
         pSettlementInfoConfirm.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqSettlementInfoConfirm(pSettlementInfoConfirm, requestID)))
-        self.run()
 
     def myReqTradingAccountPasswordUpdate(self, *args, **kwargs):
         self.log.debug("myReqTradingAccountPasswordUpdate")
@@ -1048,7 +1004,6 @@ class MyTraderApi(TraderApi):
         pTradingAccountPasswordUpdate.BrokerID = self.BrokerID
         pTradingAccountPasswordUpdate.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqTradingAccountPasswordUpdate(pTradingAccountPasswordUpdate, requestID)))
-        self.run()
 
     def myReqUserLogin(self, *args, **kwargs):
         self.log.debug("myReqUserLogin")
@@ -1058,7 +1013,6 @@ class MyTraderApi(TraderApi):
         pReqUserLogin.BrokerID = self.BrokerID
         pReqUserLogin.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqUserLogin(pReqUserLogin, requestID)))
-        self.run()
 
     def myReqUserLogout(self, *args, **kwargs):
         self.log.debug("myReqUserLogout")
@@ -1068,7 +1022,6 @@ class MyTraderApi(TraderApi):
         pUserLogout.BrokerID = self.BrokerID
         pUserLogout.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqUserLogout(pUserLogout, requestID)))
-        self.run()
 
     def myReqUserPasswordUpdate(self, *args, **kwargs):
         self.log.debug("myReqUserPasswordUpdate")
@@ -1078,5 +1031,4 @@ class MyTraderApi(TraderApi):
         pUserPasswordUpdate.BrokerID = self.BrokerID
         pUserPasswordUpdate.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqUserPasswordUpdate(pUserPasswordUpdate, requestID)))
-        self.run()
 

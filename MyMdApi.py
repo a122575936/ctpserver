@@ -4,19 +4,21 @@ import time
 from ctp.futures import MdApi,ApiStruct
 from blinker import signal
 
+from call_repeatedly import call_repeatedly
+
 class MyMdApi(MdApi):
     def __init__(self):
         self.log = logging.getLogger("MyMdApi")
         self.queue = Queue.PriorityQueue()
         self.requestID = 1
+        call_repeatedly(1, self.run)
         self.BrokerID = "8000"
         self.InvestorID = "81180429"
 
     def run(self):
-        while not self.queue.empty():
+        if not self.queue.empty():
             func = self.queue.get()
             apply(func[1])
-            time.sleep(1)
 
     def OnFrontConnected(self):
         self.log.debug("OnFrontConnected")
@@ -83,7 +85,6 @@ class MyMdApi(MdApi):
         pReqUserLogin.BrokerID = self.BrokerID
         pReqUserLogin.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqUserLogin(pReqUserLogin, requestID)))
-        self.run()
 
     def myReqUserLogout(self, *args, **kwargs):
         self.log.debug("myReqUserLogout")
@@ -93,5 +94,4 @@ class MyMdApi(MdApi):
         pUserLogout.BrokerID = self.BrokerID
         pUserLogout.InvestorID= self.InvestorID
         self.queue.put((1000, lambda :self.ReqUserLogout(pUserLogout, requestID)))
-        self.run()
 
