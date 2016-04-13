@@ -83,8 +83,6 @@ class TraderHandler:
                 )
 
     def OnRspUserLogin(self, sender, **kwargs):
-        #self.investorPositions = []
-        #self.traderapi.myReqQryInvestorPosition()
         pass
 
     def OnFrontConnected(self, sender, **kwargs):
@@ -109,8 +107,8 @@ class TraderHandler:
         self.depthMarketDataDict[pDepthMarketData.InstrumentID] = evalApiStruct(pDepthMarketData.__str__())
 
     def OnRtnTrade(self, sender, **kwargs):
-        #self.investorPositions = []
-        #self.traderapi.myReqQryInvestorPosition()
+        self.investorPositions = []
+        self.traderapi.myReqQryInvestorPosition()
         pass
 
     def OnRtnOrder(self, sender, **kwargs):
